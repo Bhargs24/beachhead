@@ -4,26 +4,25 @@ Libra ICP sourcer.
 Libra's GTM question is: which specific job, for which specific US buyer, gets
 someone to pay. This tool scores a universe of candidate companies (companies.csv)
 against a written ICP, using each company's live public job postings as the
-signal, so the list is ranked by real evidence instead of gut feel. It does not
-invent companies; you give it the universe, it does the reading and scoring.
+signal, and ranks them by fit. You supply the universe and the ICP; it does the
+fetching, keyword-scoring, and ranking. It does not invent companies.
 
-The ICP (encoded below as a scoring function):
-  - Libra can't out-enterprise Glean from a standing start, so the universe is
-    mid-market, not the Fortune 500.
-  - A company hiring Operations / RevOps / CS roles has cross-tool coordination
-    outrunning its headcount. That open role is the pain signal and the person to
-    sell to.
-  - The job post lists the tools they run on. Every one of Libra's named
-    integrations (Slack, Gmail, Notion, Jira, Drive, Salesforce, HubSpot) that
-    shows up is evidence of the sprawl Libra collapses.
-  - Specific compliance language (SOC 2, HIPAA, BAA, PCI, ISO 27001, FedRAMP) is
-    Libra's unlock: in regulated US buying it is the blocker Libra removes.
-  - Very large boards are flagged as probable Glean territory and penalized, with
-    the reason logged rather than deleted.
+Each row is built around one named open role, the buyer. The tools it detects and
+the link it shows both come from that single posting, so the evidence matches the
+role the row actually names. Compliance is read company-wide, since it is a
+company attribute, not a property of one job.
 
-Swap the three keyword lists to test a different ICP; swap companies.csv to point
-it at a different universe. No dependencies. Data is live and public (Greenhouse,
-Lever, Ashby). Every row carries a real URL you can click to verify.
+The ICP (edit the keyword lists and WEIGHTS below to test a different buyer):
+  - a company hiring an Operations / RevOps / CS role has cross-tool coordination
+    outrunning its headcount; that open role is the pain and the person to sell to
+  - the role's job post names the tools they run on; Libra's integrations that
+    appear are evidence of the sprawl Libra collapses
+  - specific compliance language (SOC 2, HIPAA, BAA, PCI, ISO 27001, FedRAMP) is
+    Libra's unlock in regulated US buying
+  - very large boards are flagged as probable Glean territory and penalized
+
+No dependencies. Data is live and public (Greenhouse, Lever, Ashby). Built with
+AI assistance under my direction; the ICP design and the target judgment are mine.
 """
 from __future__ import annotations
 import urllib.request, json, html, re, csv, sys
@@ -36,31 +35,36 @@ def load_companies(path="companies.csv"):
         return [(r["name"], r["vertical"], r["ats"], r["token"])
                 for r in csv.DictReader(f)]
 
-# ---- the ICP, as data ------------------------------------------------------
-# Strong buyer titles: an open one is clear pain plus a named person to sell to.
+
+# ---- the ICP, as data. Edit these lists plus WEIGHTS to test a different buyer.
+# Whitelist of GTM/ops buyer titles. Anything not on this list is not the buyer,
+# which is safer than trying to blacklist every non-GTM ops role (talent ops,
+# legal ops, fulfillment ops, and so on) one by one.
 BUYER_STRONG = [
     "revenue operations", "revops", "sales operations", "sales ops",
     "gtm operations", "go-to-market operations", "go to market operations",
-    "chief of staff", "business operations", "biz ops", "bizops",
+    "gtm strategy", "chief of staff", "business operations", "biz ops", "bizops",
     "strategy & operations", "strategy and operations", "revenue strategy",
-    "customer success", "customer experience", "marketing operations",
+    "customer success", "customer experience", "customer operations",
+    "client operations", "channel operations", "marketing operations",
     "deal desk", "deal operations", "partnerships operations",
     "growth operations", "revenue enablement", "sales enablement",
 ]
-# Never the buyer we want (technical or wrong-domain roles).
 HARD_EXCLUDE = ["engineer", "engineering", "developer", "devops", " sre",
                 "site reliability", "architect"]
-# Generic "operations" titles that are functional/clinical, not the GTM buyer.
+# Functional / clinical / domain ops that are not the GTM buyer. Applied to every
+# candidate title, including strong matches, so junk cannot slip through.
 SOFT_EXCLUDE = [
     "clinical", "outpatient", "inpatient", "provider", "care team", "pharmacy",
-    "claims", "payment operation", "payments operation", "benefits operation",
-    "trading", "warehouse", "fulfillment", "supply chain", "manufacturing",
-    "hardware", "flight", "people operation", "hr operation", "workplace",
-    "facilities", "data operation", "trust & safety", "trust and safety",
-    "risk operation", "credit operation", "lending operation", "loan",
-    "collections", "kyc operation", "it operation", "revenue cycle",
-    "network operation", "field operation", "underwriting operation",
-    "security operation", "product operation",
+    "compounding", "claims", "payment operation", "payments operation",
+    "benefits operation", "vendor management", "training operation",
+    "conversion operation", "temporary", "trading", "warehouse", "fulfillment",
+    "supply chain", "manufacturing", "hardware", "flight", "people operation",
+    "hr operation", "workplace", "facilities", "data operation",
+    "trust & safety", "trust and safety", "risk operation", "credit operation",
+    "lending operation", "loan", "collections", "kyc operation", "it operation",
+    "revenue cycle", "network operation", "field operation",
+    "underwriting operation", "security operation", "product operation",
 ]
 TOOLS_CORE = ["slack", "gmail", "notion", "jira", "google drive",
               "google workspace", "salesforce", "hubspot"]
@@ -68,15 +72,20 @@ TOOLS_ADJACENT = ["zendesk", "intercom", "linear", "confluence", "gong",
                   "outreach", "salesloft", "asana", "netsuite", "looker"]
 # Only specific, discriminating terms. Generic words like "compliance" and
 # "audit" appear in almost every job post, so they are deliberately excluded.
-COMPLIANCE = ["soc 2", "soc2", "hipaa", "baa", "business associate agreement",
+COMPLIANCE = ["soc 2", "hipaa", "baa", "business associate agreement",
               "pci", "iso 27001", "fedramp"]
-PAIN = ["cross-functional", "manual", "coordinate", "streamline", "reporting",
-        "tooling", "operational efficiency", "process improvement",
-        "scale operations", "stakeholder"]
 US_MARKERS = ["united states", "usa", "u.s", "remote", "new york", "san francisco",
               "boston", "austin", "chicago", "denver", "seattle", "atlanta",
               "los angeles", "california", "texas", "florida", ", ny", ", ca",
               ", tx", ", ma", ", il", ", co", ", wa", ", ga", "nyc"]
+# Explicit non-US regions override a generic "remote" marker.
+NON_US = ["emea", "apac", "united kingdom", " uk", "london", "europe", "india",
+          "canada", "germany", "france", "dublin", "singapore", "australia",
+          "latam", "ireland", "netherlands", "remote - e"]
+# Scoring weights kept as data so the ICP is genuinely tunable.
+WEIGHTS = {"buyer_role": 40, "core_tool": 9, "core_cap": 45, "adjacent_tool": 3,
+           "adjacent_cap": 9, "compliance": 8, "compliance_cap": 24,
+           "large_penalty": 20, "large_board": 150}
 
 
 def _get(url):
@@ -86,7 +95,8 @@ def _get(url):
 
 
 def _clean(text):
-    return re.sub(r"<[^>]+>", " ", html.unescape(text or "")).lower()
+    t = re.sub(r"<[^>]+>", " ", html.unescape(text or "")).lower()
+    return t.replace("soc2", "soc 2")  # normalize so SOC2 and SOC 2 count once
 
 
 def fetch(company):
@@ -124,72 +134,71 @@ def fetch(company):
 
 
 def is_us(loc):
-    l = (loc or "").lower()
-    return l.strip() == "" or any(m in l for m in US_MARKERS)
+    l = (loc or "").lower().strip()
+    if not l or any(x in l for x in NON_US):   # blank or an explicit foreign region
+        return False
+    return any(m in l for m in US_MARKERS)
 
 
 def is_buyer_role(title):
     t = (title or "").lower()
     if any(h in t for h in HARD_EXCLUDE):
         return False
-    if any(s in t for s in BUYER_STRONG):
-        return True
-    if "operations" in t or "chief of staff" in t:
-        return not any(x in t for x in SOFT_EXCLUDE)
-    return False
+    if any(x in t for x in SOFT_EXCLUDE):
+        return False
+    return any(s in t for s in BUYER_STRONG)
 
 
 def _seniority(title):
+    """Rank by seniority tier, most senior first. Not title length."""
     t = title.lower()
-    for i, kw in enumerate(["vp", "vice president", "head of", "chief", "director",
-                            "principal", "lead", "senior", "manager"]):
+    tiers = ["chief", "vp", "vice president", "head of", "director",
+             "principal", "senior", "lead", "manager"]
+    for rank, kw in enumerate(tiers):
         if kw in t:
-            return len(t) - i  # earlier keyword = more senior
+            return len(tiers) - rank
     return 0
 
 
 def score_company(company, jobs):
     name, vertical, ats, token = company
     buyer_jobs = [j for j in jobs if is_buyer_role(j["title"]) and is_us(j["location"])]
-    buyer_text = " ".join(j["text"] for j in buyer_jobs)
-    all_text = " ".join(j["text"] for j in jobs)
+    persona_job = max(buyer_jobs, key=lambda j: _seniority(j["title"])) if buyer_jobs else None
 
-    tools_core = sorted({t for t in TOOLS_CORE if t in buyer_text})
-    tools_adj = sorted({t for t in TOOLS_ADJACENT if t in buyer_text})
+    # Tools come from the one role we name, so the evidence matches the row and
+    # the score is not simply a reward for having more open postings. Compliance
+    # is read company-wide, since it is a company attribute, not a job's.
+    role_text = persona_job["text"] if persona_job else ""
+    all_text = " ".join(j["text"] for j in jobs)
+    tools_core = sorted({t for t in TOOLS_CORE if t in role_text})
+    tools_adj = sorted({t for t in TOOLS_ADJACENT if t in role_text})
     comp = sorted({c for c in COMPLIANCE if c in all_text})
-    pain_hit = any(p in buyer_text for p in PAIN)
 
     score = 0
     if buyer_jobs:
-        score += 40
-    score += min(len(tools_core) * 9, 45)
-    score += min(len(tools_adj) * 3, 9)
-    score += min(len(comp) * 8, 24)
-    if pain_hit:
-        score += 5
+        score += WEIGHTS["buyer_role"]
+    score += min(len(tools_core) * WEIGHTS["core_tool"], WEIGHTS["core_cap"])
+    score += min(len(tools_adj) * WEIGHTS["adjacent_tool"], WEIGHTS["adjacent_cap"])
+    score += min(len(comp) * WEIGHTS["compliance"], WEIGHTS["compliance_cap"])
 
     size_flag, disqualifier = "", ""
     total = len(jobs)
-    if total > 150:
+    if total > WEIGHTS["large_board"]:
         size_flag = "LARGE"
-        disqualifier = (f"{total} open roles: likely enterprise, probable Glean territory; "
-                        f"kept as a compliance-wedge stress test")
-        score -= 20
+        disqualifier = (f"{total} open roles: likely enterprise, probable Glean "
+                        f"territory; kept as a wedge stress test")
+        score -= WEIGHTS["large_penalty"]
     elif total < 4 and not buyer_jobs:
         disqualifier = "tiny board, no clear buyer role open right now"
 
-    persona = ""
-    if buyer_jobs:
-        persona = max(buyer_jobs, key=lambda j: _seniority(j["title"]))["title"]
-    evidence_url = buyer_jobs[0]["url"] if buyer_jobs else (jobs[0]["url"] if jobs else "")
-
     return {"company": name, "vertical": vertical, "score": max(score, 0),
-            "buyer_role_open": persona or "none open now",
+            "buyer_role_open": persona_job["title"] if persona_job else "none open now",
             "buyer_roles_count": len(buyer_jobs),
-            "tools_detected": ", ".join(tools_core + tools_adj) or "none in buyer JDs",
+            "tools_detected": ", ".join(tools_core + tools_adj) or "none in role JD",
             "compliance_signals": ", ".join(comp) or "none",
             "open_roles": total, "size_flag": size_flag,
-            "evidence_url": evidence_url, "disqualifier": disqualifier}
+            "evidence_url": persona_job["url"] if persona_job else "",
+            "disqualifier": disqualifier}
 
 
 def main():
@@ -212,9 +221,9 @@ def main():
     for i, r in enumerate(results, 1):
         print(f"{i:>2}  {r['company']:18} {r['vertical']:10} {r['score']:>5}  "
               f"{r['buyer_role_open'][:41]:42} {r['compliance_signals'][:19]:20}")
-    scored = [r for r in results if r["score"] >= 40]
-    print(f"\nWrote targets.csv ({len(results)} companies scanned, {len(scored)} with a live buyer role). "
-          f"Every row has a real evidence_url.")
+    with_buyer = sum(1 for r in results if r["buyer_roles_count"] > 0)
+    print(f"\nWrote targets.csv ({len(results)} companies scanned, {with_buyer} with an "
+          f"open buyer role). The evidence URL points at the exact role named.")
 
 
 if __name__ == "__main__":
