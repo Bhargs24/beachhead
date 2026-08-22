@@ -2,91 +2,39 @@
 Libra ICP sourcer.
 
 Libra's GTM question is: which specific job, for which specific US buyer, gets
-someone to pay. Answering it starts with a target list built against a written
-ICP. This tool builds that list from real hiring signal instead of a hand-typed
-guess: it reads companies' live public job postings and scores each company on
-how well it fits Libra's actual wedge.
+someone to pay. This tool scores a universe of candidate companies (companies.csv)
+against a written ICP, using each company's live public job postings as the
+signal, so the list is ranked by real evidence instead of gut feel. It does not
+invent companies; you give it the universe, it does the reading and scoring.
 
-The wedge (encoded below as a scoring function):
-  - Libra can't out-enterprise Glean from a standing start, so the target is
+The ICP (encoded below as a scoring function):
+  - Libra can't out-enterprise Glean from a standing start, so the universe is
     mid-market, not the Fortune 500.
-  - A company hiring Operations / RevOps / CS roles is a company whose cross-tool
-    coordination is outrunning its headcount. That open role is both the pain
-    signal and the person to sell to.
+  - A company hiring Operations / RevOps / CS roles has cross-tool coordination
+    outrunning its headcount. That open role is the pain signal and the person to
+    sell to.
   - The job post lists the tools they run on. Every one of Libra's named
     integrations (Slack, Gmail, Notion, Jira, Drive, Salesforce, HubSpot) that
     shows up is evidence of the sprawl Libra collapses.
-  - SOC 2 / HIPAA / BAA / PCI language is Libra's unlock: in regulated US buying,
-    compliance is the blocker Libra removes, so it is weighted heavily.
+  - Specific compliance language (SOC 2, HIPAA, BAA, PCI, ISO 27001, FedRAMP) is
+    Libra's unlock: in regulated US buying it is the blocker Libra removes.
   - Very large boards are flagged as probable Glean territory and penalized, with
     the reason logged rather than deleted.
 
-No dependencies. Data is live and public (Greenhouse, Lever, and Ashby APIs).
-Every row carries a real URL you can click to verify the evidence yourself.
+Swap the three keyword lists to test a different ICP; swap companies.csv to point
+it at a different universe. No dependencies. Data is live and public (Greenhouse,
+Lever, Ashby). Every row carries a real URL you can click to verify.
 """
 from __future__ import annotations
 import urllib.request, json, html, re, csv, sys
 from concurrent.futures import ThreadPoolExecutor
 
-# ---- companies to scan: real, mid-market, regulated or ops-heavy US firms -----
-# (name, vertical, ats, token). Extend freely; the scorer does the rest.
-COMPANIES = [
-    # healthtech (BAA / HIPAA is the unlock)
-    ("Oscar Health",      "healthtech", "greenhouse", "oscar"),
-    ("Collective Health", "healthtech", "greenhouse", "collectivehealth"),
-    ("Two Chairs",        "healthtech", "greenhouse", "twochairs"),
-    ("Lyra Health",       "healthtech", "lever",      "lyrahealth"),
-    ("Ro",                "healthtech", "lever",      "ro"),
-    ("Sidecar Health",    "healthtech", "greenhouse", "sidecarhealth"),
-    ("Tia",               "healthtech", "greenhouse", "tia"),
-    ("Komodo Health",     "healthtech", "greenhouse", "komodohealth"),
-    ("Abridge",           "healthtech", "ashby",      "abridge"),
-    ("Included Health",   "healthtech", "lever",      "includedhealth"),
-    ("Headway",           "healthtech", "ashby",      "headway"),
-    ("Grow Therapy",      "healthtech", "ashby",      "grow-therapy"),
-    ("Spring Health",     "healthtech", "ashby",      "spring-health"),
-    # fintech (SOC 2 / PCI gated)
-    ("Mercury",           "fintech",    "greenhouse", "mercury"),
-    ("Relay",             "fintech",    "lever",      "relay"),
-    ("Lithic",            "fintech",    "greenhouse", "lithic"),
-    ("Brex",              "fintech",    "greenhouse", "brex"),
-    ("Gusto",             "fintech",    "greenhouse", "gusto"),
-    ("Highnote",          "fintech",    "greenhouse", "highnote"),
-    ("Finix",             "fintech",    "lever",      "finix"),
-    ("Ramp",              "fintech",    "ashby",      "ramp"),
-    ("Sardine",           "fintech",    "ashby",      "sardine"),
-    ("Parafin",           "fintech",    "ashby",      "parafin"),
-    ("Capchase",          "fintech",    "ashby",      "capchase"),
-    ("Rho",               "fintech",    "ashby",      "rho"),
-    ("Coast",             "fintech",    "greenhouse", "coast"),
-    ("Pigment",           "saas",       "lever",      "pigment"),
-    # insurtech
-    ("Coalition",         "insurtech",  "greenhouse", "coalition"),
-    ("Counterpart",       "insurtech",  "greenhouse", "counterpart"),
-    ("Openly",            "insurtech",  "ashby",      "openly"),
-    ("Kin",               "insurtech",  "ashby",      "kin"),
-    # identity / regtech (compliance-native buyers)
-    ("Alloy",             "fintech",    "greenhouse", "alloy"),
-    ("Persona",           "regtech",    "ashby",      "persona"),
-    ("Socure",            "regtech",    "ashby",      "socure"),
-    ("Middesk",           "regtech",    "ashby",      "middesk"),
-    ("Trulioo",           "regtech",    "ashby",      "trulioo"),
-    ("Stytch",            "regtech",    "ashby",      "stytch"),
-    ("WorkOS",            "regtech",    "ashby",      "workos"),
-    # compliance / security SaaS
-    ("Secureframe",       "regtech",    "lever",      "secureframe"),
-    ("Thoropass",         "regtech",    "greenhouse", "thoropass"),
-    ("Tines",             "regtech",    "greenhouse", "tines"),
-    ("Vanta",             "regtech",    "ashby",      "vanta"),
-    ("Drata",             "regtech",    "ashby",      "drata"),
-    ("Hyperproof",        "regtech",    "greenhouse", "hyperproof"),
-    ("Huntress",          "regtech",    "greenhouse", "huntress"),
-    ("Abnormal Security", "regtech",    "greenhouse", "abnormalsecurity"),
-    ("Checkr",            "regtech",    "greenhouse", "checkr"),
-    # ops / CS SaaS
-    ("Planhat",           "saas",       "ashby",      "planhat"),
-    ("Watershed",         "saas",       "ashby",      "watershed"),
-]
+
+def load_companies(path="companies.csv"):
+    """The universe to score, as data not code. Rows: name,vertical,ats,token."""
+    with open(path, newline="", encoding="utf-8") as f:
+        return [(r["name"], r["vertical"], r["ats"], r["token"])
+                for r in csv.DictReader(f)]
 
 # ---- the ICP, as data ------------------------------------------------------
 # Strong buyer titles: an open one is clear pain plus a named person to sell to.
@@ -118,9 +66,10 @@ TOOLS_CORE = ["slack", "gmail", "notion", "jira", "google drive",
               "google workspace", "salesforce", "hubspot"]
 TOOLS_ADJACENT = ["zendesk", "intercom", "linear", "confluence", "gong",
                   "outreach", "salesloft", "asana", "netsuite", "looker"]
+# Only specific, discriminating terms. Generic words like "compliance" and
+# "audit" appear in almost every job post, so they are deliberately excluded.
 COMPLIANCE = ["soc 2", "soc2", "hipaa", "baa", "business associate agreement",
-              "phi", "pci", "gdpr", "iso 27001", "fedramp", "regulated",
-              "audit", "compliance"]
+              "pci", "iso 27001", "fedramp"]
 PAIN = ["cross-functional", "manual", "coordinate", "streamline", "reporting",
         "tooling", "operational efficiency", "process improvement",
         "scale operations", "stakeholder"]
@@ -244,8 +193,9 @@ def score_company(company, jobs):
 
 
 def main():
+    companies = load_companies()
     with ThreadPoolExecutor(max_workers=12) as ex:
-        results = list(ex.map(lambda c: score_company(c, fetch(c)), COMPANIES))
+        results = list(ex.map(lambda c: score_company(c, fetch(c)), companies))
     results.sort(key=lambda r: r["score"], reverse=True)
 
     cols = ["rank", "company", "vertical", "score", "buyer_role_open",

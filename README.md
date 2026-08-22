@@ -16,7 +16,7 @@ Every row links to the real posting.
 python sourcer.py      # no dependencies, standard library only
 ```
 
-The ICP is three keyword lists at the top of `sourcer.py`. Swap them and the list rebuilds for a different buyer, which is how you test one hypothesis against another.
+The company universe lives in `companies.csv` (name, vertical, ATS, token), so you point it at any set of accounts by editing data, not code. The ICP itself is three keyword lists at the top of `sourcer.py`; swap them and the list re-ranks for a different buyer, which is how you test one hypothesis against another.
 
 ## What it found (live)
 
