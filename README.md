@@ -1,6 +1,6 @@
 # libra-sourcer
 
-Builds a target account list for Libra from live hiring signal. Point it at an ICP, it returns a scored, evidence-linked list of companies in minutes.
+Turns a set of candidate companies into a ranked, evidence-backed target list for Libra, scored on live hiring signal. You supply the companies and the ICP; it does the reading and the ranking in minutes.
 
 ## What it does
 
@@ -20,6 +20,6 @@ The company universe lives in `companies.csv` (name, vertical, ATS, token), so y
 
 ## What it found (live)
 
-49 companies scanned, 28 with an open buyer role. Top of the list: Counterpart, Abnormal Security, Sardine, Drata, Checkr. Full ranked output in `targets.csv`.
+49 companies scanned, 28 with an open buyer role. Top of the list: Abnormal Security, Ramp, Drata, Mercury, Sardine. Full ranked output in `targets.csv`.
 
 Built by Bhargav Raghavendra.
