@@ -1,0 +1,53 @@
+{
+  "market": "B2B SaaS — Operations & RevOps buyers (US)",
+  "thesis": "The buyer is whoever owns cross-tool coordination that has outrun headcount. An open Operations, RevOps, or Customer Success role is both the pain and the person to sell to. The tools its job description names are the sprawl a horizontal product collapses; specific compliance language is the wedge that clears a security review in regulated buying. Very large boards are flagged as likely enterprise with longer procurement.",
+  "buyer": {
+    "titles": [
+      "revenue operations", "revops", "sales operations", "sales ops",
+      "gtm operations", "go-to-market operations", "gtm strategy", "chief of staff",
+      "business operations", "biz ops", "bizops", "strategy & operations",
+      "strategy and operations", "revenue strategy", "customer success",
+      "customer experience", "customer operations", "client operations",
+      "channel operations", "marketing operations", "deal desk", "deal operations",
+      "partnerships operations", "growth operations", "revenue enablement",
+      "sales enablement"
+    ],
+    "exclude": [
+      "engineer", "engineering", "developer", "devops", "site reliability",
+      "architect", "clinical", "provider", "care team", "pharmacy", "claims",
+      "payment operation", "benefits operation", "vendor management", "warehouse",
+      "fulfillment", "supply chain", "manufacturing", "people operation",
+      "hr operation", "workplace", "facilities", "data operation", "trust & safety",
+      "risk operation", "credit operation", "loan", "collections", "it operation",
+      "revenue cycle", "field operation", "security operation", "product operation"
+    ]
+  },
+  "signals": {
+    "core_tools": {
+      "weight": 9, "cap": 45,
+      "terms": ["slack", "gmail", "notion", "jira", "google drive",
+        "google workspace", "salesforce", "hubspot"]
+    },
+    "adjacent_tools": {
+      "weight": 3, "cap": 9,
+      "terms": ["zendesk", "intercom", "linear", "confluence", "gong",
+        "outreach", "salesloft", "asana", "netsuite", "looker"]
+    },
+    "compliance_wedge": {
+      "weight": 8, "cap": 24,
+      "terms": ["soc 2", "hipaa", "baa", "business associate agreement",
+        "pci", "iso 27001", "fedramp"]
+    }
+  },
+  "geo": {
+    "include": ["united states", "usa", "u.s", "remote", "new york",
+      "san francisco", "boston", "austin", "chicago", "denver", "seattle",
+      "atlanta", "los angeles", "california", "texas", "florida", ", ny",
+      ", ca", ", tx", ", ma", ", il", ", co", ", wa", ", ga", "nyc"],
+    "exclude": ["emea", "apac", "united kingdom", " uk", "london", "europe",
+      "india", "canada", "germany", "france", "dublin", "singapore",
+      "australia", "latam", "ireland", "netherlands", "remote - e"]
+  },
+  "size": { "large_board_over": 150, "penalty": 20 },
+  "weights": { "buyer_role": 40 }
+}

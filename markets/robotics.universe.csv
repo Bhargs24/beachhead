@@ -1,0 +1,33 @@
+name,segment,ats,token
+Figure AI,humanoid,greenhouse,figureai
+1X Technologies,humanoid,ashby,1x
+Apptronik,humanoid,greenhouse,apptronik
+Agility Robotics,humanoid,greenhouse,agilityrobotics
+Collaborative Robotics,humanoid,ashby,cobot
+Sanctuary AI,humanoid,ashby,sanctuary
+Physical Intelligence,foundation-models,ashby,physicalintelligence
+Field AI,foundation-models,lever,field-ai
+Nuro,autonomy-software,greenhouse,nuro
+Waabi,autonomy-software,lever,waabi
+Anduril,defense,greenhouse,andurilindustries
+Shield AI,defense,lever,shieldai
+Zipline,drones-aerospace,greenhouse,flyzipline
+Skydio,drones-aerospace,ashby,skydio
+Path Robotics,manufacturing-inspection,greenhouse,pathrobotics
+Standard Bots,manufacturing-inspection,ashby,standardbots
+Bright Machines,manufacturing-inspection,lever,brightmachines
+Carbon Robotics,agriculture,greenhouse,carbonrobotics
+Dexterity,warehouse-logistics,lever,dexterity
+Nimble Robotics,warehouse-logistics,greenhouse,nimblerobotics
+Formic,warehouse-logistics,greenhouse,formic
+Gather AI,warehouse-logistics,greenhouse,gatherai
+Pickle Robot,warehouse-logistics,lever,picklerobot
+Locus Robotics,warehouse-logistics,greenhouse,locusrobotics
+Fox Robotics,warehouse-logistics,greenhouse,fox
+Third Wave Automation,warehouse-logistics,greenhouse,thirdwaveautomation
+Ambi Robotics,warehouse-logistics,lever,ambirobotics
+Serve Robotics,service-healthcare,ashby,serverobotics
+Diligent Robotics,service-healthcare,greenhouse,diligentrobotics
+Cobalt Robotics,service-healthcare,lever,cobaltrobotics
+Polymath Robotics,robotics-infra,ashby,polymath
+Foxglove,robotics-infra,ashby,foxglove

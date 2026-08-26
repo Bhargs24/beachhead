@@ -1,0 +1,50 @@
+rank,company,segment,score,buyer_role_open,buyer_roles_count,signals,open_roles,evidence_url,note
+1,Vanta,regtech,73,Senior GTM Strategy & Operations Manager,8,"core_tools: salesforce; compliance_wedge: hipaa, iso 27001, soc 2",106,https://jobs.ashbyhq.com/vanta/b70e3e50-1294-4b6c-b17e-8441fb89bbfb,
+2,Grow Therapy,healthtech,61,"Senior Manager, Marketing Operations",1,"core_tools: notion, slack; adjacent_tools: asana",34,https://jobs.ashbyhq.com/grow-therapy/3b5eabca-f87b-4118-b82e-4f715cb11a46,
+3,Counterpart,insurtech,61,Revenue Operations Lead,1,"core_tools: hubspot, salesforce; adjacent_tools: intercom",9,https://job-boards.greenhouse.io/counterpart/jobs/4718521005,
+4,Drata,regtech,61,Senior Marketing Operations Specialist,1,"core_tools: hubspot, salesforce; adjacent_tools: asana",47,https://jobs.ashbyhq.com/drata/c3fdb5d0-dc77-4d71-a2e5-1c85ebaf3ed8,
+5,Sardine,fintech,58,Revenue Operations Manager,1,"core_tools: hubspot, salesforce",32,https://jobs.ashbyhq.com/sardine/b6ca1fd5-a374-4c99-a6fd-a0c4d0859a61,
+6,Alloy,fintech,52,Channel Operations Manager,1,core_tools: salesforce; adjacent_tools: gong,25,https://www.alloy.com/about/jobs/detail?gh_jid=8691237002&gh_jid=8691237002,
+7,Persona,regtech,52,Customer Operations Manager,1,core_tools: salesforce; adjacent_tools: looker,18,https://jobs.ashbyhq.com/persona/3394c9a4-9b9f-45f9-a56d-9a4c8619c7f7,
+8,Socure,regtech,49,"Strategic Customer Success Manager,  Public Sector",1,core_tools: salesforce,97,https://jobs.ashbyhq.com/socure/67d4f48f-5bc1-4723-a489-a0ea5726a1e4,
+9,Tines,regtech,43,Senior Customer Success Manager - East/Public Sector,4,adjacent_tools: intercom,20,https://job-boards.greenhouse.io/tines/jobs/6129779004,
+10,Headway,healthtech,40,"Chief of Staff, R&D ",5,none in role JD,83,https://jobs.ashbyhq.com/headway/18261737-fed6-4203-aeaa-6068545f9f1e,
+11,Spring Health,healthtech,40,"Director, Business Operations & Strategy",4,none in role JD,62,https://jobs.ashbyhq.com/spring-health/8bf5c6ea-f22e-4830-b294-f21200c2b267,
+12,Finix,fintech,40,Business Operations Analyst,1,none in role JD,14,https://jobs.lever.co/finix/68f25f58-45ad-4683-adbc-8d40c3e0b62c,
+13,Ramp,fintech,40,"Director, Customer Experience",7,none in role JD,135,https://jobs.ashbyhq.com/ramp/1285aefc-d2c4-4f7c-8357-6e8f97fb22d4,
+14,Coast,fintech,40,"Chief of Staff, Office of the CEO",2,none in role JD,19,https://job-boards.greenhouse.io/coast/jobs/6121098004,
+15,Pigment,saas,40,"Customer Success Manager, EPM  - San Francisco, Austin, or New York",1,none in role JD,103,https://jobs.lever.co/pigment/f5471302-f110-4940-a509-f18ece1bdd3d,
+16,Coalition,insurtech,40,Customer Success Manager,2,none in role JD,37,https://www.coalitioninc.com/job-posting?gh_jid=4721663005,
+17,Abnormal Security,regtech,40,"Senior Director, Customer Success",7,none in role JD,77,https://abnormal.ai/careers/jobs/7896809003?gh_jid=7896809003,
+18,Checkr,regtech,40,Chief of Staff,4,none in role JD,46,https://job-boards.greenhouse.io/checkr/jobs/7913718,
+19,Planhat,saas,40,Customer Success Manager,4,none in role JD,42,https://jobs.ashbyhq.com/planhat/713fd8a8-854f-4cc0-9e80-0d89266779ee,
+20,Watershed,saas,40,"Customer success manager, strategic",3,none in role JD,33,https://jobs.ashbyhq.com/watershed/c11056e0-8841-4b91-9f13-e1a04ad7e858,
+21,Brex,fintech,32,"Director, Revenue Operations",17,core_tools: salesforce; adjacent_tools: outreach,288,https://www.brex.com/careers/8716927002?gh_jid=8716927002,"288 open roles: likely late-stage, longer procurement; kept as a stress case"
+22,Oscar Health,healthtech,20,"Director, Business Operations & Strategy",13,none in role JD,264,http://www.hioscar.com/careers/8109252?gh_jid=8109252,"264 open roles: likely late-stage, longer procurement; kept as a stress case"
+23,Collective Health,healthtech,0,none open now,0,none in role JD,13,,no buyer role open right now; low intent this scan
+24,Two Chairs,healthtech,0,none open now,0,none in role JD,30,,no buyer role open right now; low intent this scan
+25,Lyra Health,healthtech,0,none open now,0,none in role JD,539,,"539 open roles: likely late-stage, longer procurement; kept as a stress case"
+26,Ro,healthtech,0,none open now,0,none in role JD,52,,no buyer role open right now; low intent this scan
+27,Sidecar Health,healthtech,0,none open now,0,none in role JD,13,,no buyer role open right now; low intent this scan
+28,Tia,healthtech,0,none open now,0,none in role JD,0,,no buyer role open right now; low intent this scan
+29,Komodo Health,healthtech,0,none open now,0,none in role JD,34,,no buyer role open right now; low intent this scan
+30,Abridge,healthtech,0,none open now,0,none in role JD,46,,no buyer role open right now; low intent this scan
+31,Included Health,healthtech,0,none open now,0,none in role JD,149,,no buyer role open right now; low intent this scan
+32,Mercury,fintech,0,none open now,0,none in role JD,54,,no buyer role open right now; low intent this scan
+33,Relay,fintech,0,none open now,0,none in role JD,3,,no buyer role open right now; low intent this scan
+34,Lithic,fintech,0,none open now,0,none in role JD,5,,no buyer role open right now; low intent this scan
+35,Gusto,fintech,0,none open now,0,none in role JD,86,,no buyer role open right now; low intent this scan
+36,Highnote,fintech,0,none open now,0,none in role JD,7,,no buyer role open right now; low intent this scan
+37,Parafin,fintech,0,none open now,0,none in role JD,21,,no buyer role open right now; low intent this scan
+38,Capchase,fintech,0,none open now,0,none in role JD,6,,no buyer role open right now; low intent this scan
+39,Rho,fintech,0,none open now,0,none in role JD,45,,no buyer role open right now; low intent this scan
+40,Openly,insurtech,0,none open now,0,none in role JD,5,,no buyer role open right now; low intent this scan
+41,Kin,insurtech,0,none open now,0,none in role JD,21,,no buyer role open right now; low intent this scan
+42,Middesk,regtech,0,none open now,0,none in role JD,21,,no buyer role open right now; low intent this scan
+43,Trulioo,regtech,0,none open now,0,none in role JD,43,,no buyer role open right now; low intent this scan
+44,Stytch,regtech,0,none open now,0,none in role JD,5,,no buyer role open right now; low intent this scan
+45,WorkOS,regtech,0,none open now,0,none in role JD,28,,no buyer role open right now; low intent this scan
+46,Secureframe,regtech,0,none open now,0,none in role JD,15,,no buyer role open right now; low intent this scan
+47,Thoropass,regtech,0,none open now,0,none in role JD,8,,no buyer role open right now; low intent this scan
+48,Hyperproof,regtech,0,none open now,0,none in role JD,6,,no buyer role open right now; low intent this scan
+49,Huntress,regtech,0,none open now,0,none in role JD,36,,no buyer role open right now; low intent this scan

@@ -1,0 +1,54 @@
+{
+  "market": "Physical AI & Robotics",
+  "thesis": "The buyer for an AI product in this sector is the team standing up the software, autonomy, and data stack that turns hardware into a shipping robot. A senior software, autonomy, ML, or data role open right now is the tell: it means that stack is being built or scaled this quarter, which is exactly when tooling and data decisions get made. Segment the market, then rank each company by whether that role is open and how strongly its job description signals AI, data-scale, and simulation work an outside product could plug into.",
+  "buyer": {
+    "titles": [
+      "head of software", "vp software", "vp engineering", "director of engineering",
+      "head of autonomy", "autonomy", "head of ai", "head of machine learning",
+      "machine learning", "ml", "head of perception", "perception",
+      "head of data", "data platform", "data engineering", "head of robotics",
+      "robotics software", "simulation", "fleet software"
+    ],
+    "exclude": [
+      "intern", "recruiter", "sourcer", "sales", "account executive", "marketing",
+      "accountant", "accounting", "finance", "people", "talent", "mechanical",
+      "electrical", "hardware engineer", "technician", "assembler", "operator",
+      "installer", "manufacturing associate", "warehouse associate", "field service",
+      "executive assistant", "assistant", "office manager"
+    ]
+  },
+  "signals": {
+    "ai_stack": {
+      "weight": 6, "cap": 36,
+      "terms": ["foundation model", "large language model", " llm", "generative",
+        "reinforcement learning", "imitation learning", "vision language", "vla",
+        "transformer", "world model", "computer vision", "slam", "manipulation",
+        "end-to-end learning", "diffusion policy"]
+    },
+    "data_scale": {
+      "weight": 6, "cap": 30,
+      "terms": ["data pipeline", "data platform", "petabyte", "large-scale data",
+        "teleoperation", "fleet data", "sensor data", "labeling", "annotation",
+        "data engine", "logs", "data infrastructure"]
+    },
+    "scaling_now": {
+      "weight": 5, "cap": 25,
+      "terms": ["0 to 1", "zero to one", "0-to-1", "first ", "founding", "greenfield",
+        "stand up", "build out", "scale the", "rapidly scaling", "hyper-growth",
+        "from scratch", "ground up"]
+    },
+    "sim_tooling": {
+      "weight": 4, "cap": 20,
+      "terms": ["simulation", "sim-to-real", "synthetic data", "digital twin",
+        "isaac", "mujoco", "gazebo", "ros2", " ros ", "nvidia omniverse"]
+    },
+    "deploy_scale": {
+      "weight": 4, "cap": 16,
+      "terms": ["in production", "customer sites", "commercial deployment",
+        "scale to", "fleets of", "thousands of robots", "at scale", "24/7"]
+    }
+  },
+  "geo": { "include": [], "exclude": [] },
+  "size": { "large_board_over": 300, "penalty": 15 },
+  "weights": { "buyer_role": 40 }
+}
